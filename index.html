@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Compress No Stress</title>
+  <style>
+    body { font-family:sans-serif; margin:0; display:flex; align-items:center; justify-content:center; min-height:100vh; background:#f1f1f1; }
+    #app { background:#fff; padding:2rem; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1); text-align:center; max-width:400px; width:100%; }
+    button { margin-top:1rem; padding:0.5rem 1rem; }
+    #ads { margin-top:2rem; min-height:100px; border:1px dashed #ccc; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <h1>Compress No Stress</h1>
+    <p>Free PDF Compression — No Sign‑Up, No Stress.</p>
+    <input type="file" id="fileInput" accept="application/pdf" />
+    <br/>
+    <button id="compressBtn" disabled>Make It Smaller</button>
+    <div id="downloadLink" style="margin-top:1rem;"></div>
+    <div id="ads"><!-- AdSense goes here --></div>
+  </div>
+  <script>
+    const BACKEND = "https://compress-backend.onrender.com/compress";
+    const fileInput = document.getElementById("fileInput");
+    const btn = document.getElementById("compressBtn");
+    const dl = document.getElementById("downloadLink");
+    fileInput.addEventListener("change", () => {
+      dl.innerHTML = "";
+      btn.disabled = !fileInput.files.length;
+    });
+    btn.addEventListener("click", async () => {
+      btn.textContent = "Compressing…";
+      const fd = new FormData();
+      fd.append("file", fileInput.files[0]);
+      const res = await fetch(BACKEND, { method: "POST", body: fd });
+      if (!res.ok) { alert("Oops—try again."); btn.textContent = "Make It Smaller"; return; }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      dl.innerHTML = `<a href="${url}" download="compressed.pdf">Download Compressed PDF</a>`;
+      btn.textContent = "Make It Smaller";
+    });
+  </script>
+</body>
+</html>
